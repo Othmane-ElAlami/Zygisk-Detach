@@ -78,10 +78,7 @@ impl Menus {
             }
             self.stdout.flush()?;
 
-            let key = keys
-                .next()
-                .expect("keys() should block")
-                .expect("faulty keyboard?");
+            let key = keys.next().unwrap().unwrap();
             write!(
                 self.stdout,
                 "\r{}{}",
@@ -161,11 +158,7 @@ impl Menus {
             self.stdout.flush()?;
             write!(self.stdout, "\r{}", clear::AfterCursor)?;
 
-            match keys
-                .next()
-                .expect("keys() should block")
-                .expect("faulty keyboard?")
-            {
+            match keys.next().unwrap().unwrap() {
                 Key::Char('\n') => {
                     break Ok(if list_len > select_idx {
                         Some(list.remove(select_idx))
@@ -230,12 +223,7 @@ impl Menus {
         }
         write!(self.stdout, "{}. Quit\r\n", 'q'.green())?;
         self.stdout.flush()?;
-        let key = io::stdin()
-            .lock()
-            .keys()
-            .next()
-            .expect("keys() should block")
-            .expect("faulty keyboard?");
+        let key = io::stdin().lock().keys().next().unwrap().unwrap();
         write!(
             self.stdout,
             "\r{}{}",
