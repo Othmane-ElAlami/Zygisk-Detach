@@ -147,6 +147,11 @@ class ZygiskDetach : public zygisk::ModuleBase {
         }
     }
 
+    void preServerSpecialize(zygisk::ServerSpecializeArgs* args) override {
+        (void)args;
+        api->setOption(zygisk::Option::DLCLOSE_MODULE_LIBRARY);
+    }
+
     void cleanup(const zygisk::AppSpecializeArgs* args) {
         free(DETACH_TXT);
         env->ReleaseStringUTFChars(args->nice_name, process);
