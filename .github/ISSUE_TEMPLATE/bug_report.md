@@ -13,4 +13,6 @@ assignees: ''
 
 **Logs taken with `su -c logcat -d -s "zygisk-detach" > /sdcard/log.txt`:**
 
+Do not report issues of zygisk modules, try with alternatives if you cannot get anything to be logged.
+
 Not providing this information will get your issue closed without any response!
