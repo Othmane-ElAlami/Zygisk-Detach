@@ -2,9 +2,9 @@
 *.so
 b.sh
 test*
-magisk/bin/*/detach
-magisk/bin/*/ksu_profile
-magisk/webroot/*
+module/bin/*/detach
+module/bin/*/ksu_profile
+module/webroot/*
 *.log
 zygisk-rust
 aidl/*.aidl*
