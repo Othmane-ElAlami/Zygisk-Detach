@@ -4,7 +4,7 @@ const template = document.getElementById('app-template').content;
 const appsList = document.getElementById('apps-list');
 
 async function run(cmd) {
-	const LOG_DIR = "/sdcard/zygisk-detach.log";
+	const LOG_DIR = "/data/adb/modules/zygisk-detach/webui.log";
 	const { errno, stdout, stderr } = await exec(cmd);
 	if (errno != 0) {
 		toast(`Command '${cmd}' fail.`)
