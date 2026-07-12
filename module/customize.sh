@@ -2,7 +2,7 @@
 
 chmod -R +x "$MODPATH/bin/"
 
-if [ -n "$KSU" ]; then
+if [ -n "$KSU" ] || [ -n "$KSU_NEXT" ]; then
 	ui_print "- KernelSU detected. Make sure you are using a Zygisk module!"
 
 	uid=$(dumpsys package "com.android.vending" 2>&1 | grep -m1 "uid")
@@ -50,7 +50,7 @@ else
 fi
 
 ui_print "- Or use zygisk-detach-app"
-if [ -n "$KSU" ]; then
+if [ -n "$KSU" ] || [ -n "$KSU_NEXT" ]; then
 	ui_print "- Or use the WebUI from KernelSU app"
 fi
 ui_print ""
