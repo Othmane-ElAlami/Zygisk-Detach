@@ -1,6 +1,6 @@
 {
 	"version": "v1.23.2",
 	"versionCode": 34,
-	"zipUrl": "https://github.com/j-hc/zygisk-detach/releases/latest/download/zygisk-detach-v1.23.2.zip",
-	"changelog": "https://raw.githubusercontent.com/j-hc/zygisk-detach/master/README.md"
+	"zipUrl": "https://github.com/Othmane-ElAlami/Zygisk-Detach/releases/download/v1.23.2/Zygisk-Detach-v1.23.2.zip",
+	"changelog": "https://raw.githubusercontent.com/Othmane-ElAlami/Zygisk-Detach/master/README.md"
 }

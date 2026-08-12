@@ -1,0 +1,97 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Extract Version and Validate
+        id: vars
+        shell: pwsh
+        run: |
+          $prop = Get-Content "module/module.prop" -Raw
+          $versionMatch = [regex]::Match($prop, '(?m)^version=(.+)$')
+          $versionCodeMatch = [regex]::Match($prop, '(?m)^versionCode=(.+)$')
+
+          if (-not $versionMatch.Success) {
+              Write-Error "Failed to parse version from module.prop"
+              exit 1
+          }
+          if (-not $versionCodeMatch.Success) {
+              Write-Error "Failed to parse versionCode from module.prop"
+              exit 1
+          }
+
+          $moduleVersion = $versionMatch.Groups[1].Value.Trim()
+          $moduleVersionCode = $versionCodeMatch.Groups[1].Value.Trim()
+
+          Write-Output "MODULE_VERSION=$moduleVersion" >> $env:GITHUB_ENV
+          Write-Output "MODULE_VERSION_CODE=$moduleVersionCode" >> $env:GITHUB_ENV
+
+          if ("${{ github.event_name }}" -eq "push") {
+              $tagVersion = "${{ github.ref_name }}"
+              if ($moduleVersion -ne $tagVersion) {
+                  Write-Error "Tag version ($tagVersion) does not match module.prop version ($moduleVersion)"
+                  exit 1
+              }
+          }
+
+          $updateJson = Get-Content "update.json" -Raw | ConvertFrom-Json
+          if ($updateJson.version -ne $moduleVersion) {
+              Write-Error "update.json version ($($updateJson.version)) does not match module.prop version ($moduleVersion)"
+              exit 1
+          }
+          if ([string]$updateJson.versionCode -ne [string]$moduleVersionCode) {
+              Write-Error "update.json versionCode ($($updateJson.versionCode)) does not match module.prop versionCode ($moduleVersionCode)"
+              exit 1
+          }
+
+          $expectedZipUrl = "https://github.com/Othmane-ElAlami/Zygisk-Detach/releases/download/$moduleVersion/Zygisk-Detach-$moduleVersion.zip"
+          if ($updateJson.zipUrl -ne $expectedZipUrl) {
+              Write-Error "update.json zipUrl ($($updateJson.zipUrl)) does not match expected URL ($expectedZipUrl)"
+              exit 1
+          }
+
+      - name: Build Module
+        shell: pwsh
+        run: |
+          .\build.ps1
+
+      - name: Validate Artifact
+        shell: pwsh
+        run: |
+          $expectedArtifact = "Zygisk-Detach-${{ env.MODULE_VERSION }}.zip"
+          if (-not (Test-Path $expectedArtifact)) {
+              Write-Error "Expected artifact $expectedArtifact not found!"
+              exit 1
+          }
+          Write-Output "ARTIFACT_NAME=$expectedArtifact" >> $env:GITHUB_ENV
+
+      - name: Publish Release
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $releaseNotes = "Detaches installed apps from the Play Store against its aggressive updating policy.`n`n"
+          $releaseNotes += "### Highlights`n"
+          $releaseNotes += "- Magisk / Zygisk compatible`n"
+          $releaseNotes += "- KernelSU and KernelSU Next support with a compatible Zygisk implementation`n"
+          $releaseNotes += "- Manage via CLI or WebUI`n`n"
+          $releaseNotes += "**Installation**: Flash in Magisk or KernelSU/Next and reboot.`n"
+          
+          gh release create "${{ github.ref_name }}" "${{ env.ARTIFACT_NAME }}" `
+            --verify-tag `
+            --title "Zygisk - Detach ${{ env.MODULE_VERSION }}" `
+            --notes $releaseNotes `
+            --generate-notes

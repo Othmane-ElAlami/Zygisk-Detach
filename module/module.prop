@@ -4,4 +4,4 @@ version=v1.23.2
 versionCode=34
 author=j-hc
 description=Detaches installed apps from Play Store
-updateJson=https://raw.githubusercontent.com/j-hc/zygisk-detach/master/update.json
+updateJson=https://raw.githubusercontent.com/Othmane-ElAlami/Zygisk-Detach/master/update.json

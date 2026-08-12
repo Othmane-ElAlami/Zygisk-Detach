@@ -1,8 +1,8 @@
-$ErrorActionPreference = "Stop"
+param (
+    [string]$UpstreamVersion = ""
+)
 
-Write-Host "Reading update.json..."
-$updateJson = Get-Content -Raw "update.json" | ConvertFrom-Json
-$zipUrl = $updateJson.zipUrl
+$ErrorActionPreference = "Stop"
 
 $tempZip = "Upstream-Release.zip"
 $extractDir = "Extracted"
@@ -21,6 +21,11 @@ if (Test-Path "module\module.prop") {
     }
 }
 $outZip = "$moduleName-$moduleVersion.zip"
+
+if ([string]::IsNullOrWhiteSpace($UpstreamVersion)) {
+    $UpstreamVersion = $moduleVersion
+}
+$zipUrl = "https://github.com/j-hc/zygisk-detach/releases/download/$UpstreamVersion/zygisk-detach-$UpstreamVersion.zip"
 
 Write-Host "Downloading upstream release from $zipUrl ..."
 Invoke-WebRequest -Uri $zipUrl -OutFile $tempZip
